@@ -52,8 +52,6 @@ button{font:inherit;cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--surface-2);color:var(--navy);font-weight:600}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 .status{font-size:12px;color:var(--muted);min-width:0}
-.hint{font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 16px}
-.hint b{color:var(--ink);font-weight:600}
 
 .board{flex:1;min-height:0;overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);position:relative;overscroll-behavior:contain}
 .canvas{position:relative;width:calc(var(--lw) + var(--cw) + var(--days) * var(--dw));min-width:100%}
@@ -209,7 +207,7 @@ button{font:inherit;cursor:pointer}
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:8px;align-items:center}
 .actions .sp{flex:1}
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#183345;color:#fff;padding:8px 14px;border-radius:var(--r);font-size:13px;z-index:30;max-width:calc(100% - 32px)}
-@media (max-width:640px){.canvas.costs-open{--cw:92px}:root{--lw:132px}.hint{display:none}h1{font-size:20px}.grip{width:18px}.toggle{padding-left:6px}.toggle .cnt{display:none}}
+@media (max-width:640px){.canvas.costs-open{--cw:92px}:root{--lw:132px}h1{font-size:20px}.grip{width:18px}.toggle{padding-left:6px}.toggle .cnt{display:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
 .login{position:fixed;inset:0;z-index:40;background:var(--bg);display:grid;place-items:center;padding:24px max(16px,env(safe-area-inset-right,0px)) 24px max(16px,env(safe-area-inset-left,0px))}
@@ -218,6 +216,30 @@ button{font:inherit;cursor:pointer}
 .login p{margin:0;color:var(--muted);font-size:13.5px;line-height:1.45}
 .login .msg{color:var(--ink)}
 .who{font-size:12px;color:var(--muted)}
+.notesbtn{display:inline-flex;align-items:center;gap:6px;margin-right:6px}
+.notesbtn #notes-cnt{color:var(--muted);font-size:12px}
+.notesbtn.has::after{content:"";width:6px;height:6px;border-radius:50%;background:#d1db5f;margin-left:-2px}
+.rtbar{display:flex;flex-wrap:wrap;gap:4px;border:1px solid var(--line-strong);border-bottom:0;border-radius:var(--r) var(--r) 0 0;padding:4px;background:var(--surface-2)}
+.rtbar button{border:1px solid transparent;background:transparent;color:var(--navy);min-width:30px;height:28px;border-radius:var(--r);padding:0 7px;font-size:13px;display:grid;place-items:center}
+.rtbar button:hover{background:var(--surface);border-color:var(--line-strong)}
+.rtbar button.on{background:var(--surface);border-color:var(--navy)}
+.rtbar .sep{width:1px;background:var(--line-strong);margin:4px 3px}
+.rtbar .hl{background:#e5ec8a;color:#183345;padding:0 4px;border-radius:2px;font-weight:600}
+.pad{min-height:220px;max-height:46vh;overflow:auto;border:1px solid var(--line-strong);border-radius:0 0 var(--r) var(--r);background:var(--bg);padding:10px 12px;line-height:1.5;font-size:14.5px;color:var(--ink);overflow-wrap:anywhere}
+.pad:focus{outline:2px solid var(--focus);outline-offset:-1px}
+.pad:empty::before{content:attr(data-ph);color:var(--muted)}
+.pad h3{font-family:var(--f-head);font-weight:600;font-size:16px;color:var(--navy);margin:10px 0 4px}
+.pad p,.pad div{margin:0}
+.pad ul,.pad ol{margin:4px 0;padding-left:22px}
+.pad mark,.pad span[style*="background"]{background:#e5ec8a!important;color:#183345;border-radius:2px;padding:0 1px}
+.padstate{font-size:11.5px;color:var(--muted);text-align:right;margin-top:-8px}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}
+.thumbs figure{margin:0;position:relative;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface-2);aspect-ratio:1}
+.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+.thumbs figure .x{position:absolute;top:4px;right:4px;background:rgba(255,255,255,.9);color:#183345}
+.thumbs figure .x.arm{background:var(--b-rot);color:#fff}
+.thumbs figcaption{position:absolute;left:0;right:0;bottom:0;font-size:10.5px;padding:3px 6px;background:rgba(24,51,69,.72);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dropz.over{outline:2px dashed var(--navy);outline-offset:4px}
 </style>
 </head>
 <body>
@@ -238,17 +260,16 @@ button{font:inherit;cursor:pointer}
       <div class="sub">Zuberweg &amp; Bühl · 1. Dezember 2026 bis 31. März 2027 · KW 49 – KW 13</div>
     </div>
     <div class="tools">
+      <button class="btn notesbtn" id="btn-notes" title="Allgemeine Notizen, Fotos und Dateien"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h5"/></svg>Notizen &amp; Dateien <span id="notes-cnt"></span></button>
       <span class="status" id="status">Lade Plan …</span>
       <div class="seg" role="group" aria-label="Zoom">
         <button id="z-s" data-z="12">Woche</button><button id="z-m" data-z="20">Normal</button><button id="z-l" data-z="32">Tag</button>
       </div>
-      <button class="btn" id="btn-notes">Notizen <span id="notes-cnt"></span></button>
       <button class="btn" id="btn-today">Heute</button>
       <button class="btn primary" id="btn-new">+ Eintrag</button>
       <span class="who" id="who"></span><button class="btn" id="btn-logout">Abmelden</button>
     </div>
   </header>
-  <div class="hint" id="hint"><span><b>Im Raster ziehen</b> = neuer Balken</span><span><b>Balken ziehen</b> = verschieben (auch in andere Zeile)</span><span><b>Rand ziehen</b> = Dauer ändern</span><span><b>Klick</b> = Text &amp; Details</span><span><b>⋮⋮ ziehen</b> = Zeile verschieben</span><span>Gelb hinterlegt = Feiertag</span></div>
   <div class="board" id="board"><div class="canvas" id="canvas"></div></div>
 </div>
 <div class="scrim" id="scrim" hidden></div>
@@ -717,29 +738,136 @@ button{font:inherit;cursor:pointer}
   }
 
   // ---------- Notizen ----------
-  function notesCount(){ const n = S.notes.size; $('notes-cnt').textContent = n ? `(${n})` : ''; }
+  const PAD_ID = '__pad__';
+  const isImg = n => /\.(jpe?g|png|gif|webp|heic|heif|avif)$/i.test(n);
+  function cleanHTML(html){
+    const doc = new DOMParser().parseFromString('<div>'+(html||'')+'</div>', 'text/html');
+    const OK = { B:1, STRONG:1, I:1, EM:1, U:1, MARK:1, BR:1, P:1, DIV:1, UL:1, OL:1, LI:1, H3:1, SPAN:1 };
+    const walk = el => { [...el.childNodes].forEach(n => {
+      if (n.nodeType === 3) return;
+      if (n.nodeType !== 1 || !OK[n.tagName]){ if (n.nodeType === 1 && !/^(SCRIPT|STYLE|IFRAME|OBJECT)$/.test(n.tagName)){ walk(n); n.replaceWith(...n.childNodes); } else n.remove(); return; }
+      const st = (n.getAttribute('style')||'').toLowerCase();
+      const wrap = n.tagName === 'SPAN' ? [/font-weight:\s*(bold|[6-9]00)/.test(st)&&'b', /font-style:\s*italic/.test(st)&&'i', /text-decoration[^;]*underline/.test(st)&&'u'].filter(Boolean) : [];
+      const bg = n.tagName === 'SPAN' && /background/i.test(n.getAttribute('style')||'') && !/transparent|initial|inherit/i.test(n.getAttribute('style')||'');
+      [...n.attributes].forEach(a => n.removeAttribute(a.name));
+      if (n.tagName === 'SPAN'){ let inner = doc.createDocumentFragment(); inner.append(...n.childNodes); for (const t of [...wrap, ...(bg?['mark']:[])]){ const w = doc.createElement(t); w.append(inner); inner = doc.createDocumentFragment(); inner.append(w); } const tmp = doc.createElement('div'); tmp.append(inner); walk(tmp); n.replaceWith(...tmp.childNodes); return; }
+      walk(n);
+    }); };
+    const root = doc.body.firstChild; walk(root); return root.innerHTML.trim();
+  }
+  const padText = () => S.notes.get(PAD_ID)?.text || '';
+  const padEmpty = h => !String(h||'').replace(/<br\s*\/?>|<\/?(p|div)>|&nbsp;|\s/gi,'');
+  let fileCount = null;
+  function notesCount(){ const b = $('btn-notes'); b.classList.toggle('has', !padEmpty(padText())); $('notes-cnt').textContent = fileCount ? `(${fileCount})` : ''; }
+  async function refreshFileCount(){ try { const { data } = await sb.storage.from('dateien').list('allgemein', { limit:500 }); fileCount = (data||[]).filter(f=>f.id).length; notesCount(); } catch {} }
+
   function openNotes(){
-    openSheet(`<h2 id="sheet-title">Notizen</h2><div class="ctx">Allgemeine Notizen zum Umbau – für euch beide sichtbar.</div>
-      <div class="f"><label for="nt-new">Neue Notiz</label><textarea id="nt-new" placeholder="z.B. Entscheid Bodenbelag, Termin mit Vermieter, offene Fragen …"></textarea></div>
-      <div class="actions" style="margin-top:0;padding-top:0"><span class="sp"></span><button class="btn primary" id="nt-add">Notiz speichern</button></div>
-      <div class="sec"><ul class="notes" id="nt-list"></ul></div>
-      <div class="actions"><span class="sp"></span><button class="btn" id="nt-x">Schliessen</button></div>`, true);
-    const renderNotes = () => {
-      const list = [...S.notes.entries()].sort((a,b)=>String(b[1].createdAt).localeCompare(String(a[1].createdAt)));
-      $('nt-list').innerHTML = list.length ? list.map(([id,n])=>`<li><div class="meta"><small>${esc(fmtDT(n.createdAt))}${n.createdBy?' · '+esc(who(n.createdBy)):''}</small><span class="sp"></span><button class="x" data-ntdel="${esc(id)}" aria-label="Notiz löschen">×</button></div><div class="txt">${esc(n.text)}</div></li>`).join('') : '<li class="empty-s">Noch keine Notizen.</li>';
-      $('nt-list').querySelectorAll('[data-ntdel]').forEach(b => armX(b, async () => {
-        const id = b.dataset.ntdel; S.notes.delete(id); renderNotes(); notesCount();
-        await write(()=>run(sb.from('notes').delete().eq('id', id)));
+    const old = [...S.notes.entries()].filter(([id])=>id!==PAD_ID).sort((a,b)=>String(b[1].createdAt).localeCompare(String(a[1].createdAt)));
+    const pad = S.notes.get(PAD_ID);
+    openSheet(`<h2 id="sheet-title">Notizen &amp; Dateien</h2><div class="ctx">Allgemeines zum Umbau – für euch beide sichtbar. Wird automatisch gespeichert.</div>
+      <div>
+        <div class="rtbar" id="rt-bar" role="toolbar" aria-label="Formatierung">
+          <button type="button" data-cmd="bold" title="Fett (Ctrl+B)"><b>F</b></button>
+          <button type="button" data-cmd="italic" title="Kursiv (Ctrl+I)"><i>K</i></button>
+          <button type="button" data-cmd="underline" title="Unterstreichen (Ctrl+U)"><u>U</u></button>
+          <button type="button" data-cmd="hl" title="Leuchtstift"><span class="hl">Leuchtstift</span></button>
+          <span class="sep"></span>
+          <button type="button" data-cmd="h3" title="Zwischentitel">Titel</button>
+          <button type="button" data-cmd="insertUnorderedList" title="Aufzählung">• Liste</button>
+          <button type="button" data-cmd="insertOrderedList" title="Nummerierte Liste">1. Liste</button>
+          <span class="sep"></span>
+          <button type="button" data-cmd="removeFormat" title="Formatierung entfernen">Format ✕</button>
+        </div>
+        <div class="pad" id="pad" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Allgemeine Notizen" data-ph="z.B. Entscheide, offene Fragen, Masse, Termine mit Vermieter …">${cleanHTML(padText())}</div>
+      </div>
+      <div class="padstate" id="pad-state">${pad?.createdAt ? 'Zuletzt gespeichert ' + esc(fmtDT(pad.createdAt)) + (pad.createdBy ? ' · ' + esc(who(pad.createdBy)) : '') : ''}</div>
+
+      <div class="sec dropz" id="nf-drop"><h3>Fotos &amp; Dateien <span id="nf-cnt"></span></h3>
+        <div class="thumbs" id="nf-thumbs"></div>
+        <ul class="files" id="nf-list"><li class="empty-s">Lade Dateien …</li></ul>
+        <div class="addrow"><input type="file" id="nf-input" multiple hidden><button class="btn" id="nf-pick" type="button">Foto / Datei hochladen</button><span class="empty-s" id="nf-msg" style="align-self:center">oder hierher ziehen</span></div>
+      </div>
+      ${old.length ? `<div class="sec"><h3>Frühere Notizen <span>${old.length}</span></h3><ul class="notes" id="nt-list">${old.map(([id,n])=>`<li><div class="meta"><small>${esc(fmtDT(n.createdAt))}${n.createdBy?' · '+esc(who(n.createdBy)):''}</small><span class="sp"></span><button class="x" data-ntdel="${esc(id)}" aria-label="Notiz löschen">×</button></div><div class="txt">${esc(n.text)}</div></li>`).join('')}</ul></div>` : ''}
+      <div class="actions"><span class="sp"></span><button class="btn" id="nt-x">Schliessen</button></div>`, true, true);
+
+    // --- Editor ---
+    const ed = $('pad'); let saveT = null, dirty = false;
+    try { document.execCommand('styleWithCSS', false, false); } catch {}
+    const save = async () => {
+      clearTimeout(saveT); if (!dirty) return; dirty = false;
+      const text = cleanHTML(ed.innerHTML); const now = new Date().toISOString();
+      S.notes.set(PAD_ID, { text, createdAt:now, createdBy:$('who').textContent }); notesCount();
+      $('pad-state') && ($('pad-state').textContent = 'Speichert …');
+      const ok = await write(()=>run(sb.from('notes').upsert({ id:PAD_ID, text, created_at:now, created_by:$('who').textContent })));
+      if ($('pad-state')) $('pad-state').textContent = ok ? 'Gespeichert ' + fmtDT(now) : 'Nicht gespeichert – bitte nochmals versuchen';
+    };
+    const queue = () => { dirty = true; if ($('pad-state')) $('pad-state').textContent = 'Ungespeicherte Änderungen …'; clearTimeout(saveT); saveT = setTimeout(save, 1200); };
+    ed.addEventListener('input', queue);
+    ed.addEventListener('blur', save);
+    ed.addEventListener('paste', e => { e.preventDefault(); const h = e.clipboardData.getData('text/html'); const t = e.clipboardData.getData('text/plain');
+      if (h) document.execCommand('insertHTML', false, cleanHTML(h)); else document.execCommand('insertText', false, t); });
+    const inMark = () => { let n = getSelection().anchorNode; while (n && n !== ed){ if (n.nodeType===1 && (n.tagName==='MARK' || (n.tagName==='SPAN' && /background/i.test(n.getAttribute('style')||'')))) return true; n = n.parentNode; } return false; };
+    const syncBar = () => { $('rt-bar')?.querySelectorAll('[data-cmd]').forEach(b => { const c=b.dataset.cmd; let on=false;
+      try { if (['bold','italic','underline','insertUnorderedList','insertOrderedList'].includes(c)) on = document.queryCommandState(c); else if (c==='hl') on = inMark(); else if (c==='h3') on = /h3/i.test(document.queryCommandValue('formatBlock')); } catch {}
+      b.classList.toggle('on', on); }); };
+    document.addEventListener('selectionchange', syncBar);
+    $('rt-bar').addEventListener('mousedown', e => e.preventDefault());
+    $('rt-bar').addEventListener('click', e => {
+      const b = e.target.closest('[data-cmd]'); if (!b) return; ed.focus(); const c = b.dataset.cmd;
+      if (c === 'hl') document.execCommand('hiliteColor', false, inMark() ? 'transparent' : '#e5ec8a');
+      else if (c === 'h3') document.execCommand('formatBlock', false, /h3/i.test(document.queryCommandValue('formatBlock')) ? 'div' : 'h3');
+      else if (c === 'removeFormat'){ document.execCommand('removeFormat'); document.execCommand('hiliteColor', false, 'transparent'); }
+      else document.execCommand(c);
+      queue(); syncBar();
+    });
+    const closeBtn = $('nt-x'); closeBtn.addEventListener('click', async () => { await save(); closeSheet(); });
+    const obs = new MutationObserver(() => { if (sheet.hidden || !ed.isConnected){ save(); document.removeEventListener('selectionchange', syncBar); obs.disconnect(); } });
+    obs.observe(sheet, { attributes:true, attributeFilter:['hidden'] });
+
+    // --- frühere Notizen ---
+    $('nt-list')?.querySelectorAll('[data-ntdel]').forEach(b => armX(b, async () => {
+      const id = b.dataset.ntdel; S.notes.delete(id); b.closest('li').remove();
+      await write(()=>run(sb.from('notes').delete().eq('id', id)));
+    }));
+
+    // --- Fotos & Dateien (Ordner "allgemein") ---
+    const DIR = 'allgemein';
+    const loadFiles = async () => {
+      if (!$('nf-list')) return;
+      const { data, error } = await sb.storage.from('dateien').list(DIR, { limit:500, sortBy:{ column:'created_at', order:'desc' } });
+      if (!$('nf-list')) return;
+      if (error){ $('nf-list').innerHTML = '<li class="empty-s">Dateien konnten nicht geladen werden.</li>'; return; }
+      const files = (data||[]).filter(f => f.name && f.id); fileCount = files.length; notesCount();
+      $('nf-cnt').textContent = files.length ? String(files.length) : '';
+      if (!files.length){ $('nf-thumbs').innerHTML = ''; $('nf-list').innerHTML = '<li class="empty-s">Noch nichts abgelegt. Fotos, Pläne, Inventarlisten …</li>'; return; }
+      const { data:urls } = await sb.storage.from('dateien').createSignedUrls(files.map(f=>DIR+'/'+f.name), 3600);
+      const u = i => urls?.[i]?.signedUrl || '#'; const disp = n => n.replace(/^\d+_/, '');
+      const imgs = [], docs = [];
+      files.forEach((f,i) => (isImg(f.name) ? imgs : docs).push([f,i]));
+      $('nf-thumbs').innerHTML = imgs.map(([f,i]) => `<figure><a href="${esc(u(i))}" target="_blank" rel="noopener" title="${esc(disp(f.name))}"><img src="${esc(u(i))}" alt="${esc(disp(f.name))}" loading="lazy"></a><figcaption>${esc(disp(f.name))}</figcaption><button class="x" data-nfdel="${esc(f.name)}" aria-label="Foto löschen">×</button></figure>`).join('');
+      $('nf-list').innerHTML = docs.map(([f,i]) => `<li><a href="${esc(u(i))}" target="_blank" rel="noopener" title="${esc(disp(f.name))}">${esc(disp(f.name))}</a><small>${f.metadata?.size?fmtSize(f.metadata.size):''}</small><small>${f.created_at?new Date(f.created_at).toLocaleDateString('de-CH'):''}</small><button class="x" data-nfdel="${esc(f.name)}" aria-label="Datei löschen">×</button></li>`).join('');
+      sheet.querySelectorAll('[data-nfdel]').forEach(b => armX(b, async () => {
+        const { error } = await sb.storage.from('dateien').remove([DIR + '/' + b.dataset.nfdel]);
+        if (error) toast('Löschen hat nicht geklappt.'); loadFiles();
       }));
     };
-    renderNotes();
-    $('nt-x').addEventListener('click', closeSheet);
-    $('nt-add').addEventListener('click', async () => {
-      const text = $('nt-new').value.trim(); if (!text) return;
-      const id = uuid(); S.notes.set(id, { text, createdAt:new Date().toISOString(), createdBy:$('who').textContent });
-      $('nt-new').value = ''; renderNotes(); notesCount();
-      await write(()=>run(sb.from('notes').insert({ id, text })));
-    });
+    const upload = async files => {
+      let ok = 0;
+      for (const [i,f] of files.entries()){
+        $('nf-msg').textContent = `Lade hoch ${i+1}/${files.length} …`;
+        if (f.size > 50*1048576){ toast(`${f.name} ist grösser als 50 MB.`); continue; }
+        const { error } = await sb.storage.from('dateien').upload(`${DIR}/${Date.now()}_${safeName(f.name || 'foto.jpg')}`, f, { contentType: f.type || undefined });
+        if (error) toast(`${f.name}: Hochladen hat nicht geklappt.`); else ok++;
+      }
+      if ($('nf-msg')){ $('nf-msg').textContent = ok ? `${ok} hochgeladen` : ''; loadFiles(); }
+    };
+    loadFiles();
+    $('nf-pick').addEventListener('click', () => $('nf-input').click());
+    $('nf-input').addEventListener('change', e => { const f=[...e.target.files]; e.target.value=''; if (f.length) upload(f); });
+    const dz = $('nf-drop');
+    dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('over'); });
+    dz.addEventListener('dragleave', () => dz.classList.remove('over'));
+    dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); const f=[...(e.dataTransfer?.files||[])]; if (f.length) upload(f); });
   }
   $('btn-notes').addEventListener('click', openNotes);
   function openUnit(uid){
@@ -841,7 +969,7 @@ button{font:inherit;cursor:pointer}
     if (!allowed){ setStatus('Kein Zugang für ' + session.user.email); S.canWrite = false; render(); return; }
     S.canWrite = true;
     try { await loadAll(); setStatus('Aktuell'); } catch { setStatus('Daten nicht erreichbar'); }
-    render();
+    render(); refreshFileCount();
     sb.channel('plan')
       .on('postgres_changes', { event:'*', schema:'public', table:'units' },  scheduleReload)
       .on('postgres_changes', { event:'*', schema:'public', table:'trades' }, scheduleReload)
